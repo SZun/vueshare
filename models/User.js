@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const md5 = require("md5");
-const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
+const md5 = require('md5');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
   username: {
@@ -29,19 +29,19 @@ const UserSchema = new mongoose.Schema({
   favorites: {
     type: [mongoose.Schema.Types.ObjectId],
     required: true,
-    ref: "Post"
+    ref: 'Post'
   }
 });
 
 // Create and add avatar to user
-UserSchema.pre("save", function(next) {
+UserSchema.pre('save', function(next) {
   this.avatar = `http://gravatar.com/avatar/${md5(this.username)}?d=identicon`;
   next();
 });
 
 // Hash password so it can't be seen w/ access to database
-UserSchema.pre("save", function(next) {
-  if (!this.isModified("password")) {
+UserSchema.pre('save', function(next) {
+  if (!this.isModified('password')) {
     return next();
   }
   bcrypt.genSalt(10, (err, salt) => {
@@ -56,4 +56,4 @@ UserSchema.pre("save", function(next) {
   });
 });
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model('User', UserSchema);
