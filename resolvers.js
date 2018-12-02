@@ -20,6 +20,23 @@ module.exports = {
       });
       return user;
     },
+    searchPosts: async (_, { searchTerm }, { Post }) => {
+      if (searchTerm) {
+        // Perform text search for seach value of 'searchTerm'
+        const searchResults = await Post.find(
+          { $text: { $search: searchTerm } },
+          // Assign 'searchTerm' a text score
+          { score: { $meta: 'textScore' } }
+          // Sort results according to that textScore as well as likes
+        )
+          .sort({
+            score: { $meta: 'textScore' },
+            likes: 'desc'
+          })
+          .limit(5);
+        return searchResults;
+      }
+    },
     getPosts: async (_, args, { Post }) => {
       const posts = await Post.find({})
         .sort({ createdDate: 'desc' })
