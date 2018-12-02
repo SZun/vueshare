@@ -1,8 +1,8 @@
-import Vue from "vue";
-import Vuex from "vuex";
-import router from "./router";
+import Vue from 'vue';
+import Vuex from 'vuex';
+import router from './router';
 
-import { defaultClient as apolloClient } from "./main";
+import { defaultClient as apolloClient } from './main';
 
 import {
   GET_CURRENT_USER,
@@ -10,7 +10,7 @@ import {
   ADD_POST,
   SIGNIN_USER,
   SIGNUP_USER
-} from "./queries";
+} from './queries';
 
 Vue.use(Vuex);
 
@@ -43,34 +43,34 @@ export default new Vuex.Store({
   },
   actions: {
     getCurrentUser: ({ commit }) => {
-      commit("setLoading", true);
+      commit('setLoading', true);
       apolloClient
         .query({
           query: GET_CURRENT_USER
         })
         .then(({ data }) => {
-          commit("setLoading", false);
+          commit('setLoading', false);
           // Add user data to state
-          commit("setUser", data.getCurrentUser);
+          commit('setUser', data.getCurrentUser);
           console.log(data.getCurrentUser);
         })
         .catch(err => {
-          commit("setLoading", false);
+          commit('setLoading', false);
           console.error(err);
         });
     },
     getPosts: ({ commit }) => {
-      commit("setLoading", true);
+      commit('setLoading', true);
       apolloClient
         .query({
           query: GET_POSTS
         })
         .then(({ data }) => {
-          commit("setPosts", data.getPosts);
-          commit("setLoading", false);
+          commit('setPosts', data.getPosts);
+          commit('setLoading', false);
         })
         .catch(err => {
-          commit("setLoading", false);
+          commit('setLoading', false);
           console.error(err);
         });
     },
@@ -109,54 +109,54 @@ export default new Vuex.Store({
         });
     },
     signinUser: ({ commit }, payload) => {
-      commit("clearError");
-      commit("setLoading", true);
+      commit('clearError');
+      commit('setLoading', true);
       apolloClient
         .mutate({
           mutation: SIGNIN_USER,
           variables: payload
         })
         .then(({ data }) => {
-          commit("setLoading", false);
-          localStorage.setItem("token", data.signinUser.token);
+          commit('setLoading', false);
+          localStorage.setItem('token', data.signinUser.token);
           // to make sure created method is run in main.js (we run getCurrentUser), reload the page
           router.go();
         })
         .catch(err => {
-          commit("setLoading", false);
-          commit("setError", err);
+          commit('setLoading', false);
+          commit('setError', err);
           console.error(err);
         });
     },
     signupUser: ({ commit }, payload) => {
-      commit("clearError");
-      commit("setLoading", true);
+      commit('clearError');
+      commit('setLoading', true);
       apolloClient
         .mutate({
           mutation: SIGNUP_USER,
           variables: payload
         })
         .then(({ data }) => {
-          commit("setLoading", false);
-          localStorage.setItem("token", data.signupUser.token);
+          commit('setLoading', false);
+          localStorage.setItem('token', data.signupUser.token);
           // to make sure created method is run in main.js (we run getCurrentUser), reload the page
           router.go();
         })
         .catch(err => {
-          commit("setLoading", false);
-          commit("setError", err);
+          commit('setLoading', false);
+          commit('setError', err);
           console.error(err);
         });
     },
     signoutUser: async ({ commit }) => {
       // clear user in state
-      commit("clearUser");
+      commit('clearUser');
       // remove token in localStorage
-      localStorage.setItem("token", "");
+      localStorage.setItem('token', '');
       // end session
       await apolloClient.resetStore();
       // redirect home - kick users out of private pages (i.e. profile)
-      router.push("/");
+      router.push('/');
     }
   },
   getters: {
@@ -164,6 +164,7 @@ export default new Vuex.Store({
     user: state => state.user,
     loading: state => state.loading,
     error: state => state.error,
-    authError: state => state.authError
+    authError: state => state.authError,
+    userFavorites: state => state.user && state.user.favorites
   }
 });
