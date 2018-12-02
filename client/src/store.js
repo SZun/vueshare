@@ -10,7 +10,10 @@ import {
   ADD_POST,
   SIGNIN_USER,
   SIGNUP_USER,
-  SEARCH_POSTS
+  SEARCH_POSTS,
+  GET_USER_POSTS,
+  UPDATE_USER_POST,
+  DELETE_USER_POST
 } from './queries';
 
 Vue.use(Vuex);
@@ -19,6 +22,7 @@ export default new Vuex.Store({
   state: {
     posts: [],
     searchResults: [],
+    userPosts: [],
     user: null,
     loading: false,
     error: null,
@@ -35,6 +39,9 @@ export default new Vuex.Store({
     },
     setUser: (state, payload) => {
       state.user = payload;
+    },
+    setUserPosts: (state, payload) => {
+      state.userPosts = payload;
     },
     setLoading: (state, payload) => {
       state.loading = payload;
@@ -82,6 +89,17 @@ export default new Vuex.Store({
           console.error(err);
         });
     },
+    getUserPosts: ({ commit }, payload) => {
+      apolloClient
+        .query({
+          query: GET_USER_POSTS,
+          variables: payload
+        })
+        .then(({ data }) => {
+          commit('setUserPosts', data.getUserPosts);
+        })
+        .catch(err => console.log(err));
+    },
     searchPosts: ({ commit }, payload) => {
       apolloClient
         .query({
@@ -126,6 +144,43 @@ export default new Vuex.Store({
         .catch(err => {
           console.error(err);
         });
+    },
+    updateUserPost: ({ state, commit }, payload) => {
+      apolloClient
+        .mutate({
+          mutation: UPDATE_USER_POST,
+          variables: payload
+        })
+        .then(({ data }) => {
+          const index = state.userPosts.findIndex(
+            post => post._id === data.updateUserPost._id
+          );
+          const userPosts = [
+            ...state.userPosts.slice(0, index),
+            data.updateUserPost,
+            ...state.userPosts.slice(index + 1)
+          ];
+          commit('setUserPosts', userPosts);
+        })
+        .catch(err => console.error(err));
+    },
+    deleteUserPost: async ({ state, commit }, payload) => {
+      apolloClient
+        .mutate({
+          mutation: DELETE_USER_POST,
+          variables: payload
+        })
+        .then(({ data }) => {
+          const index = state.userPosts.findIndex(
+            post => post._id === data.deleteUserPost._id
+          );
+          const userPosts = [
+            ...state.userPosts.slice(0, index),
+            ...state.userPosts.slice(index + 1)
+          ];
+          commit('setUserPosts', userPosts);
+        })
+        .catch(err => console.error(err));
     },
     signinUser: ({ commit }, payload) => {
       commit('clearError');
@@ -181,6 +236,7 @@ export default new Vuex.Store({
   getters: {
     posts: state => state.posts,
     user: state => state.user,
+    userPosts: state => state.userPosts,
     loading: state => state.loading,
     error: state => state.error,
     authError: state => state.authError,
