@@ -64,7 +64,7 @@
                 class="mb-3"
                 color="accent"
                 text-color="white"
-              >{{category}}</v-chip>
+              >{{ category }}</v-chip>
             </span>
             <h3>{{getPost.description}}</h3>
           </v-card-text>
@@ -135,7 +135,7 @@
                   </v-list-tile-title>
                   <v-list-tile-sub-title>
                     {{message.messageUser.username}}
-                    <span class="grey--text text--lighten-1 hidden-xs-only">{{message.messageDate}}</span>
+                    <span class="grey--text text--lighten-1 hidden-xs-only">{{getTimeFromNow(message.messageDate)}}</span>
                   </v-list-tile-sub-title>
                 </v-list-tile-content>
 
@@ -157,6 +157,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import {
   GET_POST,
   ADD_POST_MESSAGE,
@@ -194,6 +195,9 @@ export default {
     ...mapGetters(['user', 'userFavorites'])
   },
   methods: {
+    getTimeFromNow(time) {
+      return moment(new Date(time)).fromNow();
+    },
     checkIfPostLiked(postId) {
       // check if user favorites includes post with id of postid
       if (

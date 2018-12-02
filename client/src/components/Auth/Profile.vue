@@ -22,7 +22,7 @@
             <v-card-title primary-title>
               <div>
                 <div class="headline">{{user.username}}</div>
-                <div>Joined {{user.joinDate}}</div>
+                <div>Joined {{formatJoinDate(user.joinDate)}}</div>
                 <div class="hidden-xs-only font-weight-thin">{{user.favorites.length}} Favorites</div>
                 <div class="hidden-xs-only font-weight-thin">2 Posts Added</div>
               </div>
@@ -67,6 +67,7 @@
             hover
           >
             <v-card-media
+              @click="goToPost(favorite._id)"
               height="30vh"
               :src="favorite.imageUrl"
             ></v-card-media>
@@ -133,6 +134,7 @@
             </v-btn>
 
             <v-card-media
+              @click="goToPost(post._id)"
               height="30vh"
               :src="post.imageUrl"
             ></v-card-media>
@@ -249,6 +251,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import { mapGetters } from 'vuex';
 export default {
   name: 'Profile',
@@ -283,6 +286,9 @@ export default {
     this.handleGetUserPosts();
   },
   methods: {
+    formatJoinDate(date) {
+      return moment(new Date(date)).format('ll');
+    },
     handleGetUserPosts() {
       this.$store.dispatch('getUserPosts', {
         userId: this.user._id
@@ -321,6 +327,9 @@ export default {
       if (deletePost) {
         this.$store.dispatch('deleteUserPost', { postId: this.postId });
       }
+    },
+    goToPost(id) {
+      this.$router.push(`/posts/${id}`);
     }
   }
 };
